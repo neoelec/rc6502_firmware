@@ -110,6 +110,9 @@ static inline void input_from_kbd(void) {
   while (Serial.available() && !serial_buf.isFull()) {
     int c = toupper(Serial.read());
 
+    if (c >= 0x80)  // ignore ASCII Extended Characters
+      continue;
+
     serial_buf.push(c);
   }
 }
