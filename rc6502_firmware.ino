@@ -4,6 +4,10 @@
 #include <RingBuf.h>
 #include <SPI.h>
 
+#ifndef ARDUINO_AVR_NANO
+#error "This sketch is only for Arduion NANO"
+#endif
+
 #define PIN_MCP23S17_nSS  10
 
 #define PORT_VIDEO        0     // of MCP23S17
