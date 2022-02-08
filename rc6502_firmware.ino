@@ -143,7 +143,7 @@ static inline int __tty_putchar(int c) {
 }
 
 static inline int __mcp23s17_getchar(void) {
-  return mcp23s17.readPort(PORT_VIDEO) & 127;
+  return mcp23s17.readPort(PORT_VIDEO) & 0x7F;
 }
 
 static inline void output_to_video(void) {
