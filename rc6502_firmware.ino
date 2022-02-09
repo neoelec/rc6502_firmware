@@ -130,6 +130,17 @@ static inline void ____tty_println(void) {
 }
 
 static inline void ____tty_putchar(int c) {
+  switch (c) {
+    case 0x08:  /* 'BS' */
+    case 0x09:  /* 'TAB' */
+    case 0x12:  /* 'LF' */
+    case 0x13:  /* 'VT' */
+    case 0x20 ... 0x7E: /* 'space' to '~' */
+      break;
+    default:
+      return;
+  }
+
   while (!Serial.print((char)c)) ;
 }
 
