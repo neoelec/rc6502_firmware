@@ -169,6 +169,15 @@ static inline void output_to_video(void) {
   }
 }
 
+static void __print_banner(void) {
+  Serial.print(F("\033[2J"));   // clear screen
+  Serial.println(F("RC6502 Apple 1 Replica"));
+  Serial.println();
+  Serial.println(F("  - E000 R - INTEGER BASIC"));
+  Serial.println(F("  - F000 R - KRUSADER 1.3"));
+  Serial.println();
+}
+
 void setup(void) {
   // put your setup code here, to run once:
   Serial.begin(115200);
@@ -177,12 +186,7 @@ void setup(void) {
   __setup_pin_video();
   __setup_pin_kbd();
 
-  Serial.print(F("\033[2J"));   // clear screen
-  Serial.println(F("RC6502 Apple 1 Replica"));
-  Serial.println();
-  Serial.println(F("  - E000 R - INTEGER BASIC"));
-  Serial.println(F("  - F000 R - KRUSADER 1.3"));
-  Serial.println();
+  __print_banner();
 }
 
 void loop(void) {
