@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 #include <Arduino.h>
-#include <MCP23S17.h>
+#include <Adafruit_MCP23X17.h>
 #include <RingBuf.h>
-#include <SPI.h>
 
 #ifndef ARDUINO_AVR_NANO
 #error "This sketch is only for Arduion NANO"
@@ -10,7 +9,6 @@
 
 #define PIN_MCP23S17_nSS  10
 
-#define PORT_VIDEO        0     // of MCP23S17
 #define PIN_VIDEO_D0      0     // of MCP23S17
 #define PIN_VIDEO_D1      1     // of MCP23S17
 #define PIN_VIDEO_D2      2     // of MCP23S17
@@ -21,7 +19,6 @@
 #define PIN_VIDEO_nRDA    5     // of Arduino
 #define PIN_VIDEO_DA      3     // of Arduino
 
-#define PORT_KBD          1     // of MCP23S17
 #define PIN_KBD_D0        8     // of MCP23S17
 #define PIN_KBD_D1        9     // of MCP23S17
 #define PIN_KBD_D2        10    // of MCP23S17
@@ -33,7 +30,7 @@
 #define PIN_KBD_CLR       2     // of Arduino
 #define PIN_KBD_STR       4     // of Arduino
 
-static MCP23S17 mcp23s17(&SPI, PIN_MCP23S17_nSS, 0);
+static Adafruit_MCP23X17 mcp23s17;
 
 static RingBuf<int, 512> serial_buf;
 
@@ -55,7 +52,7 @@ static void __kbd_state_write_data(void) {
   int c;
 
   serial_buf.pop(c);
-  mcp23s17.writePort(PORT_KBD, c | 0x80);
+  mcp23s17.writeGPIOB(c | 0x80);
   digitalWrite(PIN_KBD_STR, HIGH);
 
   kbd_state_machine = __kbd_state_wait_clr_interrupt;
@@ -79,7 +76,7 @@ static void __kbd_state_wait_until_clr_low(void) {
 }
 
 static void __setup_mcp23s17(void) {
-  mcp23s17.begin();
+  mcp23s17.begin_SPI(PIN_MCP23S17_nSS);
 
   for (int pin = 0; pin < 16; pin++)
     mcp23s17.pinMode(pin, INPUT_PULLUP);
@@ -95,7 +92,7 @@ static void __setup_pin_kbd(void) {
   for (int pin = PIN_KBD_D0; pin <= PIN_KBD_DA; pin++)
     mcp23s17.pinMode(pin, OUTPUT);
 
-  mcp23s17.writePort(PORT_KBD, 0x0);
+  mcp23s17.writeGPIOB(0x0);
 
   kbd_state_machine = __kbd_state_idle;
 }
@@ -154,7 +151,7 @@ static inline int __tty_putchar(int c) {
 }
 
 static inline int __mcp23s17_getchar(void) {
-  return mcp23s17.readPort(PORT_VIDEO) & 0x7F;
+  return mcp23s17.readGPIOA() & 0x7F;
 }
 
 static inline void output_to_video(void) {
